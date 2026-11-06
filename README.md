@@ -12,13 +12,18 @@ A food delivery app built with Flutter for the Mobile Application Development (M
 - Animated welcome screen after login (staggered animations with AnimationController)
 - Home/menu screen with category filter chips (Desi, Fast Food, Drinks, Desserts)
 - Add/remove items with quantity counters
-- Cart bar with item count and total, checkout dialog and order confirmation
+- Food detail page with Hero animation; returns the chosen quantity back to the menu
+- Named route navigation (all routes in `lib/routes.dart`)
+- Side drawer and BottomAppBar with a notched cart button (badge shows item count)
+- Help (FAQ), About and Profile screens; logout clears the navigation stack
+- Checkout dialog with delivery fee and order confirmation
 
 ## Project structure
 
 ```
 lib/
 ├── main.dart              # app entry point
+├── routes.dart            # named routes + onGenerateRoute
 ├── theme.dart             # colours and app theme
 ├── models/food_item.dart  # FoodItem class + menu data
 ├── services/auth_service.dart
@@ -26,7 +31,11 @@ lib/
 │   ├── login_screen.dart
 │   ├── signup_screen.dart
 │   ├── welcome_screen.dart
-│   └── home_screen.dart
+│   ├── home_screen.dart
+│   ├── food_detail_screen.dart
+│   ├── help_screen.dart
+│   ├── about_screen.dart
+│   └── profile_screen.dart
 └── widgets/food_card.dart
 ```
 

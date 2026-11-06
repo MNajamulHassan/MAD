@@ -29,4 +29,13 @@ class AuthService {
     }
     return null;
   }
+
+  /// Name and email of the saved account (for the profile screen).
+  static Future<Map<String, String>> getProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'name': prefs.getString(_nameKey) ?? 'Foodie',
+      'email': prefs.getString(_emailKey) ?? 'no email saved',
+    };
+  }
 }

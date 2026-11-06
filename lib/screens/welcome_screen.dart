@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../routes.dart';
 import '../theme.dart';
-import 'home_screen.dart';
 
 /// Shown after login. Uses one AnimationController with staggered
 /// animations: the rider drives in, then the text fades up,
@@ -66,11 +66,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _controller.forward();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
-        Navigator.pushReplacement(
+        Navigator.pushReplacementNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(userName: widget.userName),
-          ),
+          AppRoutes.home,
+          arguments: widget.userName,
         );
       }
     });

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../routes.dart';
 import '../services/auth_service.dart';
 import '../theme.dart';
-import 'signup_screen.dart';
-import 'welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,9 +46,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Navigator.pushReplacement(
+    Navigator.pushReplacementNamed(
       context,
-      MaterialPageRoute(builder: (context) => WelcomeScreen(userName: name)),
+      AppRoutes.welcome,
+      arguments: name,
     );
   }
 
@@ -185,12 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text("Don't have an account?"),
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignupScreen(),
-                                ),
-                              );
+                              Navigator.pushNamed(context, AppRoutes.signup);
                             },
                             child: const Text(
                               'Sign up',

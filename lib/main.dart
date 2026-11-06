@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/login_screen.dart';
+import 'routes.dart';
 import 'theme.dart';
 
 void main() {
@@ -16,7 +16,8 @@ class FoodieExpressApp extends StatelessWidget {
       title: 'Foodie Express',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      home: const LoginScreen(),
+      initialRoute: AppRoutes.login,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
 }

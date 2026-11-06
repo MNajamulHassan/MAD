@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/food_item.dart';
+import '../routes.dart';
 import '../theme.dart';
 import '../widgets/food_card.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -55,13 +55,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _logout() {
-    Navigator.pushReplacement(
+    Navigator.pushNamedAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      AppRoutes.login,
+      (route) => false,
     );
   }
 
+  /// Opens the detail page and waits for the quantity it returns.
+  Future<void> _openDetail(FoodItem item) async {
+    final quantity = await Navigator.pushNamed<int>(
+      context,
+      AppRoutes.foodDetail,
+      arguments: item,
+    );
+    if (quantity == null || !mounted) return;
+
+    setState(() {
+      _cart[item.name] = (_cart[item.name] ?? 0) + quantity;
+    });
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text('Added $quantity x ${item.name} to cart')),
+      );
+  }
+
   void _showCheckout() {
+    if (_cart.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Your cart is empty. Add some food first!')),
+      );
+      return;
+    }
+
     const deliveryFee = 99;
     final itemsInCart =
         menuItems.where((item) => _cart.containsKey(item.name)).toList();
@@ -135,6 +162,97 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _navItem(IconData icon, String label, String? route,
+      {bool selected = false}) {
+    final color = selected ? AppColors.accent : Colors.white70;
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: route == null ? null : () => Navigator.pushNamed(context, route),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color),
+            Text(label, style: TextStyle(color: color, fontSize: 11)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      backgroundColor: AppColors.background,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
+            color: AppColors.primary,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: AppColors.accent,
+                  child: Text(
+                    widget.userName[0].toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.dark,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.userName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        'Foodie Express member',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _drawerTile(Icons.restaurant_menu, 'Menu', null),
+          _drawerTile(Icons.person_outline, 'My Profile', AppRoutes.profile),
+          _drawerTile(Icons.help_outline, 'Help & Support', AppRoutes.help),
+          _drawerTile(Icons.info_outline, 'About', AppRoutes.about),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text('Log out'),
+            onTap: _logout,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerTile(IconData icon, String title, String? route) {
+    return ListTile(
+      leading: Icon(icon, color: AppColors.primary),
+      title: Text(title),
+      onTap: () {
+        Navigator.pop(context); // close the drawer first
+        if (route != null) Navigator.pushNamed(context, route);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,13 +277,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            tooltip: 'Log out',
-            onPressed: _logout,
-            icon: const Icon(Icons.logout),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,51 +365,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     quantity: _cart[item.name] ?? 0,
                     onAdd: () => _addToCart(item),
                     onRemove: () => _removeFromCart(item),
+                    onTap: () => _openDetail(item),
                   ),
               ],
             ),
           ),
         ],
       ),
-      // Cart bar only shows when something is in the cart
-      bottomNavigationBar: _totalItems == 0
-          ? null
-          : SafeArea(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.dark,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.shopping_basket, color: AppColors.accent),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        '$_totalItems item${_totalItems == 1 ? '' : 's'}  |  Rs. $_totalPrice',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: _showCheckout,
-                      style: TextButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.dark,
-                      ),
-                      child: const Text(
-                        'Checkout',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+      drawer: _buildDrawer(),
+      // Cart button sits in the notch of the BottomAppBar
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showCheckout,
+        backgroundColor: AppColors.accent,
+        foregroundColor: AppColors.dark,
+        shape: const CircleBorder(),
+        child: Badge(
+          isLabelVisible: _totalItems > 0,
+          label: Text('$_totalItems'),
+          child: const Icon(Icons.shopping_basket),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        color: AppColors.primary,
+        height: 68,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _navItem(Icons.home_rounded, 'Home', null, selected: true),
+            _navItem(Icons.help_outline, 'Help', AppRoutes.help),
+            const SizedBox(width: 48), // space for the cart button
+            _navItem(Icons.info_outline, 'About', AppRoutes.about),
+            _navItem(Icons.person_outline, 'Profile', AppRoutes.profile),
+          ],
+        ),
+      ),
     );
   }
 }
