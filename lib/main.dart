@@ -16,7 +16,7 @@ class FoodieExpressApp extends StatelessWidget {
       title: 'Foodie Express',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }

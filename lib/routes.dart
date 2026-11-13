@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 
 import 'models/food_item.dart';
 import 'screens/about_screen.dart';
+import 'screens/cuisines_screen.dart';
 import 'screens/food_detail_screen.dart';
 import 'screens/help_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/restaurants_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/welcome_screen.dart';
 
 /// All route names in one place so we don't mistype strings.
 class AppRoutes {
-  static const login = '/';
+  static const splash = '/';
+  static const login = '/login';
   static const signup = '/signup';
   static const welcome = '/welcome';
   static const home = '/home';
@@ -20,6 +24,8 @@ class AppRoutes {
   static const help = '/help';
   static const about = '/about';
   static const profile = '/profile';
+  static const restaurants = '/restaurants';
+  static const cuisines = '/cuisines';
 
   /// Builds the page for a route name. Routes that need data
   /// (user name or a food item) read it from settings.arguments.
@@ -28,6 +34,9 @@ class AppRoutes {
     Widget page;
 
     switch (settings.name) {
+      case splash:
+        page = const SplashScreen();
+        break;
       case login:
         page = const LoginScreen();
         break;
@@ -51,6 +60,12 @@ class AppRoutes {
         break;
       case profile:
         page = const ProfileScreen();
+        break;
+      case restaurants:
+        page = const RestaurantsScreen();
+        break;
+      case cuisines:
+        page = const CuisinesScreen();
         break;
       default:
         page = const _NotFoundScreen();
